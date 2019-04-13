@@ -21,12 +21,18 @@ void setup()
 
 void loop()
 {
-  uint16_t value = (1023 - analogRead(PIN_TUNING)) / 2;
+  float value = analogRead(PIN_TUNING);
+  // value = 1023.0 - value; // reverse pot direction
+  value /= 1023.0;
+  value = pow(value, 2.0); // 'expo' style smoothing
+  value *= 200.0; // frequency limiting
+
   position += value;
 
   int16_t offset = position - COUNT_PHASE;
 
-  if (offset > 0) {
+  if (offset > 0)
+  {
     position = offset;
   }
 
