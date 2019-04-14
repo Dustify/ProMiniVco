@@ -28,7 +28,7 @@ void tick()
 
   position += value;
 
-  if (position > COUNT_PHASE)
+  if (position >= COUNT_PHASE)
   {
     position = position - COUNT_PHASE;
   }
