@@ -3,13 +3,14 @@
 
 #define PIN_TUNING A5
 #define COUNT_PHASE 2000
+#define FACTOR 3
 
 static uint16_t position;
 static uint8_t wavetable[COUNT_PHASE];
 
 void tick()
 {
-  uint16_t value = analogRead(PIN_TUNING) / 3;
+  uint16_t value = analogRead(PIN_TUNING) / FACTOR;
   // value = 1023.0 - value; // reverse pot direction
   // value /= 1023.0;
   // value = pow(value, 2.0); // 'expo' style smoothing
@@ -27,6 +28,14 @@ void tick()
   PORTD = wavetable[position];
 }
 
+void generate_sawtooth()
+{
+  for (uint16_t i = 0; i < COUNT_PHASE; i++)
+  {
+    wavetable[i] = ((double)i / (double)COUNT_PHASE) * (double)255;
+  }
+}
+
 void setup()
 {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -34,10 +43,7 @@ void setup()
 
   DDRD = B11111111;
 
-  for (uint16_t i = 0; i < COUNT_PHASE; i++)
-  {
-    wavetable[i] = ((double)i / (double)COUNT_PHASE) * (double)255;
-  }
+  generate_sawtooth();
 
   Timer1.initialize(1e6 / 6e3);
   Timer1.attachInterrupt(tick);
