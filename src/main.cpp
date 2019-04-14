@@ -31,6 +31,7 @@ void tick()
 }
 
 static double amplitudes = 255;
+static double halfPhases = (double)COUNT_PHASE * 0.5;
 
 void generate_sawtooth()
 {
@@ -58,7 +59,6 @@ void generate_sine()
 
 void generate_triangle()
 {
-  double halfPhases = (double)COUNT_PHASE * 0.5;
   double amplitudesPerPhase = amplitudes / halfPhases;
 
   for (uint16_t i = 0; i < COUNT_PHASE; i++)
@@ -74,6 +74,14 @@ void generate_triangle()
   }
 }
 
+void generate_square()
+{
+  for (uint16_t i = 0; i < COUNT_PHASE; i++)
+  {
+    wavetable[i] = i < halfPhases ? 0 : amplitudes;
+  }
+}
+
 void setup()
 {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -83,7 +91,8 @@ void setup()
 
   // generate_sawtooth();
   // generate_sine();
-  generate_triangle();
+  // generate_triangle();
+  generate_square();
 
   Timer1.initialize(1e6 / SAMPLE_RATE);
   Timer1.attachInterrupt(tick);
