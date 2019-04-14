@@ -30,17 +30,19 @@ void tick()
   PORTD = wavetable[position];
 }
 
+static double amplitudes = 255;
+
 void generate_sawtooth()
 {
   for (uint16_t i = 0; i < COUNT_PHASE; i++)
   {
-    wavetable[i] = ((double)i / (double)COUNT_PHASE) * (double)255;
+    wavetable[i] = ((double)i / (double)COUNT_PHASE) * amplitudes;
   }
 }
 
 void generate_sine()
 {
-  double dHalfAmplitudes = 255.0 / 2.0;
+  static double halfAmplitudes = amplitudes / 2.0;
   double radiansPerPhase = (2.0 * PI) / (double)COUNT_PHASE;
 
   for (uint16_t i = 0; i < COUNT_PHASE; i++)
@@ -48,9 +50,27 @@ void generate_sine()
     double sineValue = double(i) * radiansPerPhase;
     sineValue = sin(sineValue);
     sineValue += 1;
-    sineValue *= dHalfAmplitudes;
-    
+    sineValue *= halfAmplitudes;
+
     wavetable[i] = round(sineValue);
+  }
+}
+
+void generate_triangle()
+{
+  double halfPhases = (double)COUNT_PHASE * 0.5;
+  double amplitudesPerPhase = amplitudes / halfPhases;
+
+  for (uint16_t i = 0; i < COUNT_PHASE; i++)
+  {
+    uint16_t iAdj = i;
+
+    if (iAdj >= halfPhases)
+    {
+      iAdj = COUNT_PHASE - iAdj;
+    }
+
+    wavetable[i] = round((double)iAdj * amplitudesPerPhase);
   }
 }
 
@@ -62,7 +82,8 @@ void setup()
   DDRD = B11111111;
 
   // generate_sawtooth();
-  generate_sine();
+  // generate_sine();
+  generate_triangle();
 
   Timer1.initialize(1e6 / SAMPLE_RATE);
   Timer1.attachInterrupt(tick);
