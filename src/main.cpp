@@ -2,17 +2,25 @@
 #include <TimerOne.h>
 
 #define PIN_TUNING A5
+#define PIN_CV A3
 #define PIN_WAVE 10
 #define COUNT_PHASE 1900
 #define FACTOR 3
 #define SAMPLE_RATE 6000
 
-static uint16_t position;
+static bool busy = false;
+volatile static uint16_t position;
 static uint8_t wavetable[COUNT_PHASE];
 
 void tick()
 {
-  uint16_t value = analogRead(PIN_TUNING) / FACTOR;
+  if (busy)
+  {
+    return;
+  }
+
+  uint16_t value = (analogRead(PIN_TUNING) + analogRead(PIN_CV)) / FACTOR;
+
   // value = 1023.0 - value; // reverse pot direction
   // value /= 1023.0;
   // value = pow(value, 2.0); // 'expo' style smoothing
@@ -20,11 +28,9 @@ void tick()
 
   position += value;
 
-  int16_t offset = position - COUNT_PHASE;
-
-  if (offset > 0)
+  if (position > COUNT_PHASE)
   {
-    position = offset;
+    position = position - COUNT_PHASE;
   }
 
   PORTD = wavetable[position];
@@ -86,6 +92,7 @@ void setup()
 {
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(PIN_TUNING, INPUT);
+  pinMode(PIN_CV, INPUT);
   pinMode(PIN_WAVE, INPUT_PULLUP);
 
   DDRD = B11111111;
@@ -119,6 +126,8 @@ void handleWaveChange(boolean buttonPressed)
     waveform = 0;
   }
 
+  busy = true;
+
   switch (waveform)
   {
   case 0:
@@ -134,6 +143,8 @@ void handleWaveChange(boolean buttonPressed)
     generate_sawtooth();
     break;
   }
+
+  busy = false;
 
   waveButtonDebounce = true;
 }
