@@ -22,6 +22,6 @@
 #define FACTOR 3
 
 // sample rate Hz - controls how frequently we write to the dac
-#define SAMPLE_RATE 6000
+#define SAMPLE_RATE 1e6
 
 #endif
