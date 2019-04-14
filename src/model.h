@@ -9,9 +9,6 @@
 class Model
 {
   public:
-    // defines whether or not wavetable generation is taking place
-    static bool busy;
-
     // defines current position in wavetable
     volatile static uint16_t position;
 
@@ -20,7 +17,6 @@ class Model
 };
 
 // initialise
-bool Model::busy;
 volatile uint16_t Model::position;
 uint8_t Model::wavetable[COUNT_PHASE];
 

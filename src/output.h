@@ -12,12 +12,6 @@ class Output
     // executes on each 'tick' - based on samplerate
     static void Tick()
     {
-        // if wavetable generation is taking place then do nothing
-        if (Model::busy)
-        {
-            return;
-        }
-
         // read values from analog pins and divide by factor
         uint16_t value = (analogRead(PIN_TUNING) + analogRead(PIN_CV)) / FACTOR;
 

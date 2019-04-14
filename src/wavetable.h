@@ -122,8 +122,8 @@ class WaveTable
             waveform = 0;
         }
 
-        // indicate busy state in model
-        Model::busy = true;
+        // disable ints
+        noInterrupts();
 
         // switch current waveform and generate
         switch (waveform)
@@ -142,8 +142,8 @@ class WaveTable
             break;
         }
 
-        // indicate not busy in model
-        Model::busy = false;
+        // enable ints
+        interrupts();
 
         // debounce
         waveButtonDebounce = true;
