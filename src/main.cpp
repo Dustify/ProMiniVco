@@ -38,6 +38,22 @@ void generate_sawtooth()
   }
 }
 
+void generate_sine()
+{
+  double dHalfAmplitudes = 255.0 / 2.0;
+  double radiansPerPhase = (2.0 * PI) / (double)COUNT_PHASE;
+
+  for (uint16_t i = 0; i < COUNT_PHASE; i++)
+  {
+    double sineValue = double(i) * radiansPerPhase;
+    sineValue = sin(sineValue);
+    sineValue += 1;
+    sineValue *= dHalfAmplitudes;
+    
+    wavetable[i] = round(sineValue);
+  }
+}
+
 void setup()
 {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -45,7 +61,8 @@ void setup()
 
   DDRD = B11111111;
 
-  generate_sawtooth();
+  // generate_sawtooth();
+  generate_sine();
 
   Timer1.initialize(1e6 / SAMPLE_RATE);
   Timer1.attachInterrupt(tick);
