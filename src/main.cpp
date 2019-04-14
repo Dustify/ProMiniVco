@@ -4,6 +4,8 @@
 #define PIN_TUNING A5
 #define COUNT_PHASE 2000
 #define FACTOR 3
+#define SAMPLE_RATE 6000
+#define LED_TIME_MS 500
 
 static uint16_t position;
 static uint8_t wavetable[COUNT_PHASE];
@@ -45,7 +47,7 @@ void setup()
 
   generate_sawtooth();
 
-  Timer1.initialize(1e6 / 6e3);
+  Timer1.initialize(1e6 / SAMPLE_RATE);
   Timer1.attachInterrupt(tick);
 }
 
@@ -56,5 +58,5 @@ void loop()
   STATE_LED = !STATE_LED;
 
   digitalWrite(LED_BUILTIN, STATE_LED);
-  delay(500);
+  delay(LED_TIME_MS);
 }
