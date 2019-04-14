@@ -2,10 +2,10 @@
 #include <TimerOne.h>
 
 #define PIN_TUNING A5
-#define COUNT_PHASE 2000
+#define PIN_WAVE 10
+#define COUNT_PHASE 1900
 #define FACTOR 3
 #define SAMPLE_RATE 6000
-#define LED_TIME_MS 500
 
 static uint16_t position;
 static uint8_t wavetable[COUNT_PHASE];
@@ -86,24 +86,62 @@ void setup()
 {
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(PIN_TUNING, INPUT);
+  pinMode(PIN_WAVE, INPUT_PULLUP);
 
   DDRD = B11111111;
 
-  // generate_sawtooth();
-  // generate_sine();
-  // generate_triangle();
-  generate_square();
+  generate_sine();
 
   Timer1.initialize(1e6 / SAMPLE_RATE);
   Timer1.attachInterrupt(tick);
 }
 
-static uint8_t STATE_LED = LOW;
+static uint8_t waveform = 0;
+static bool waveButtonDebounce = false;
+
+void handleWaveChange(boolean buttonPressed)
+{
+  if (!buttonPressed)
+  {
+    waveButtonDebounce = false;
+    return;
+  }
+
+  if (waveButtonDebounce)
+  {
+    return;
+  }
+
+  waveform++;
+
+  if (waveform > 3)
+  {
+    waveform = 0;
+  }
+
+  switch (waveform)
+  {
+  case 0:
+    generate_sine();
+    break;
+  case 1:
+    generate_triangle();
+    break;
+  case 2:
+    generate_square();
+    break;
+  case 3:
+    generate_sawtooth();
+    break;
+  }
+
+  waveButtonDebounce = true;
+}
 
 void loop()
 {
-  STATE_LED = !STATE_LED;
+  bool waveChangeState = digitalRead(PIN_WAVE) == LOW;
+  digitalWrite(LED_BUILTIN, waveChangeState ? HIGH : LOW);
 
-  digitalWrite(LED_BUILTIN, STATE_LED);
-  delay(LED_TIME_MS);
+  handleWaveChange(waveChangeState);
 }
